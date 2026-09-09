@@ -120,56 +120,22 @@ st.bar_chart(chart_data)
 
 st.divider()
 
-# 9. 관객수 상위 5편 막대그래프 표시 (오름차순 정렬)
-st.subheader("📊 관객수 상위 5개 영화")
+# 9. 전체 박스오피스 순위 표 (DataFrame) 출력
+st.subheader("📋 전체 순위 목록")
 
-# 관객수(audiCnt) 기준 오름차순 정렬 후 상위 5개 추출
-top_5_df = df.sort_values("audiCnt", ascending=True).tail(5)
+# 필요한 컬럼만 추출 및 이름 변경
+display_df = df[["rank", "movieNm", "openDt", "audiCnt", "audiAcc", "scrnCnt"]].copy()
+display_df.columns = ["순위", "영화명", "개봉일", "관객수", "누적관객", "스크린수"]
 
-# 그래프용 데이터 가공 (영화명을 인덱스로 지정)
-chart_data = top_5_df.set_index("movieNm")[["audiCnt"]]
-chart_data.columns = ["일별 관객수"]
-
-st.bar_chart(chart_data)
+# 표 형태로 출력 (숫자 콤마 포맷팅 지정)
+st.dataframe(
+    display_df,
+    use_container_width=True,
+    hide_index=True,
+    column_config={
+        "순위": st.column_config.NumberColumn(format="%d위"),
+        "관객수": st.column_config.NumberColumn(format="%d명"),
+        "누적관객": st.column_config.NumberColumn(format="%d명"),
+        "스크린수": st.column_config.NumberColumn(format="%d개")
     }
 )
-import datetime
-import pandas as pd
-import requests
-import streamlit as st
-
-KST = datetime.timezone(datetime.timedelta(hours=9))
-어제 = datetime.datetime.now(KST).date() - datetime.timedelta(days=1)
-고른날 = st.date_input("날짜를 고르세요", value=어제, max_value=어제)
-
-URL = "https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
-
-
-@st.cache_data(ttl=3600)
-def fetch(day_text):
-    res = requests.get(URL, params={"key": st.secrets["KOBIS_KEY"], "targetDt": day_text}, timeout=20)
-    answer = res.json().get("boxOfficeResult")
-    return answer["dailyBoxOfficeList"] if answer else []
-
-
-movies = fetch(고른날.strftime("%Y%m%d"))
-if not movies:
-    st.info("그날은 아직 집계 전입니다.")
-    st.stop()
-
-표 = pd.DataFrame([{
-    "순위": int(m["rank"]),
-    "영화명": ("🏆 " if int(m["audiAcc"]) >= 1_000_000 else "") + m["movieNm"],
-    "순위 변화": ("🔺" + str(int(m["rankInten"])) if int(m["rankInten"]) > 0
-                 else "🔻" + str(-int(m["rankInten"])) if int(m["rankInten"]) < 0 else "—"),
-    "관객수": int(m["audiCnt"]),
-    "누적관객": int(m["audiAcc"]),
-} for m in movies])
-st.dataframe(표, hide_index=True)
-st.caption("🔺 오른 영화 · 🔻 내린 영화 · 🏆 누적 100만 명을 넘은 영화")
-
-
-
-
-        
-  
