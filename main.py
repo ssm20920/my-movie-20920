@@ -135,13 +135,17 @@ col3.metric(
 
 st.divider()
 
-# 9. 관객수 상위 5편 막대그래프 표시 (오름차순 정렬)
+# 9. 관객수 상위 5편 막대그래프 표시 (5위 -> 1위: 낮은 것부터 높은 것 순)
 st.subheader("📊 관객수 상위 5개 영화")
 
-# 관객수(audiCnt) 기준 오름차순 정렬 후 상위 5개 추출
-top_5_df = df.sort_values("audiCnt", ascending=True).tail(5)
+# 1. 상위 5개 영화를 추출한 뒤, 순위(rank) 기준 내림차순(5위 -> 1위)으로 정렬합니다.
+top_5_df = df.sort_values("rank", ascending=True).head(5)
+top_5_df = top_5_df.sort_values("rank", ascending=False)
 
-# 그래프용 데이터 가공 (영화명을 인덱스로 지정)
+# 2. 영화명(movieNm) 순서를 고정하여 Streamlit의 임의 재정렬을 방지합니다.
+top_5_df["movieNm"] = pd.Categorical(top_5_df["movieNm"], categories=top_5_df["movieNm"], ordered=True)
+
+# 3. 그래프용 데이터 가공 및 출력
 chart_data = top_5_df.set_index("movieNm")[["audiCnt"]]
 chart_data.columns = ["일별 관객수"]
 
