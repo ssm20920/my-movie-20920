@@ -120,23 +120,17 @@ st.bar_chart(chart_data)
 
 st.divider()
 
-# 9. 전체 박스오피스 순위 표 (DataFrame) 출력
-st.subheader("📋 전체 순위 목록")
+# 9. 관객수 상위 5편 막대그래프 표시 (오름차순 정렬)
+st.subheader("📊 관객수 상위 5개 영화")
 
-# 필요한 컬럼만 추출 및 이름 변경
-display_df = df[["rank", "movieNm", "openDt", "audiCnt", "audiAcc", "scrnCnt"]].copy()
-display_df.columns = ["순위", "영화명", "개봉일", "관객수", "누적관객", "스크린수"]
+# 관객수(audiCnt) 기준 오름차순 정렬 후 상위 5개 추출
+top_5_df = df.sort_values("audiCnt", ascending=True).tail(5)
 
-# 표 형태로 출력 (숫자 콤마 포맷팅 지정)
-st.dataframe(
-    display_df,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "순위": st.column_config.NumberColumn(format="%d위"),
-        "관객수": st.column_config.NumberColumn(format="%d명"),
-        "누적관객": st.column_config.NumberColumn(format="%d명"),
-        "스크린수": st.column_config.NumberColumn(format="%d개")
+# 그래프용 데이터 가공 (영화명을 인덱스로 지정)
+chart_data = top_5_df.set_index("movieNm")[["audiCnt"]]
+chart_data.columns = ["일별 관객수"]
+
+st.bar_chart(chart_data)
     }
 )
 import datetime
