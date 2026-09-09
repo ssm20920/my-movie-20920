@@ -1,4 +1,14 @@
-import streamlit as st
+# 9. 관객수 상위 5편 막대그래프 표시 (오름차순 정렬)
+st.subheader("📊 관객수 상위 5개 영화")
+
+# 관객수(audiCnt) 기준 오름차순 정렬 후 상위 5개 추출
+top_5_df = df.sort_values("audiCnt", ascending=True).tail(5)
+
+# 그래프용 데이터 가공 (영화명을 인덱스로 지정)
+chart_data = top_5_df.set_index("movieNm")[["audiCnt"]]
+chart_data.columns = ["일별 관객수"]
+
+st.bar_chart(chart_data)import streamlit as st
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
