@@ -146,6 +146,7 @@ chart_data = top_5_df.set_index("movieNm")[["audiCnt"]]
 chart_data.columns = ["일별 관객수"]
 
 st.bar_chart(chart_data)
+
 st.divider()
 
 # 10. 전체 박스오피스 순위 표 (DataFrame) 출력
