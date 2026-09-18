@@ -137,3 +137,37 @@ st.plotly_chart(fig4, use_container_width=True)
 st.info(
     "**이 그래프로 알 수 있는 것:** 초기 확보한 스크린 수가 많을수록 최종 총 관객 수도 증가하는 양(+)의 상관관계 경향을 확인할 수 있으며, 장르별 분포 차이도 비교할 수 있습니다."
 )
+
+st.divider()
+
+# --- 다섯 번째 그래프: 10편 이상 장르별 총 관객 수 상자 그림 (박스플롯) ---
+st.subheader("5. 주요 장르별 총 관객 수 분포 (10편 이상 장르)")
+
+# 영화 수 10편 이상인 장르 필터링
+genre_counts_series = df["genre"].value_counts()
+major_genres = genre_counts_series[genre_counts_series >= 10].index
+df_filtered = df[df["genre"].isin(major_genres)]
+
+# Plotly 박스플롯 생성
+fig5 = px.box(
+    df_filtered,
+    x="genre",
+    y="total_audi",
+    color="genre",
+    hover_name="movieNm",
+    points="outliers",  # 이상치(outlier) 점만 표시
+    title="10편 이상 개봉 장르별 총 관객 수 박스플롯",
+    labels={"genre": "장르", "total_audi": "총 관객 수"},
+)
+
+# 마우스 오버 툴팁 설정 (이상치 및 데이터 포인트에서 영화명 확인 가능)
+fig5.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>총 관객 수: %{y:,}명<extra></extra>"
+)
+
+st.plotly_chart(fig5, use_container_width=True)
+
+# 다섯 번째 그래프 설명 구역
+st.info(
+    "**이 그래프로 알 수 있는 것:** 각 장르의 중앙값과 흥행 변동 범위를 비교할 수 있으며, 상자 밖으로 벗어난 이상치 점을 통해 장르 내 초대형 흥행작(대작)을 쉽게 식별할 수 있습니다."
+)
