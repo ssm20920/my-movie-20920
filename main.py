@@ -100,8 +100,40 @@ top_movie_idx = df["total_audi"].idxmax()
 top_movie_name = df.loc[top_movie_idx, "movieNm"]
 top_movie_audi = df.loc[top_movie_idx, "total_audi"]
 
-# 세 번째 그래프 설명 구역 (동적 분석 문구)
+# 세 번째 그래프 설명 구역
 st.info(
     f"**이 그래프로 알 수 있는 것:** 대부분의 영화는 하위 관객 수 구간(왼쪽)에 집중적으로 밀집되어 있는 '오른쪽 꼬리가 긴 분포'를 보입니다. "
     f"가장 많은 관객을 동원한 영화는 **'{top_movie_name}'**(약 {top_movie_audi:,}명)입니다."
+)
+
+st.divider()
+
+# --- 네 번째 그래프: 개봉일 스크린 수 vs 총 관객 수 (산점도) ---
+st.subheader("4. 개봉일 스크린 수와 총 관객 수의 관계")
+
+# Plotly 산점도 생성
+fig4 = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    color="genre",
+    hover_name="movieNm",
+    title="개봉일 스크린 수 vs 총 관객 수 산점도",
+    labels={
+        "first_scrn": "개봉일 스크린 수",
+        "total_audi": "총 관객 수",
+        "genre": "장르",
+    },
+)
+
+# 마우스 오버 툴팁 커스텀
+fig4.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린 수: %{x:,}개<br>총 관객 수: %{y:,}명<extra></extra>"
+)
+
+st.plotly_chart(fig4, use_container_width=True)
+
+# 네 번째 그래프 설명 구역
+st.info(
+    "**이 그래프로 알 수 있는 것:** 초기 확보한 스크린 수가 많을수록 최종 총 관객 수도 증가하는 양(+)의 상관관계 경향을 확인할 수 있으며, 장르별 분포 차이도 비교할 수 있습니다."
 )
